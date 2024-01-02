@@ -9,6 +9,6 @@ Students are expected to:
 Student Info
 =========================
 
-* Student Name: USTH CS/DS/MATH Laziness 
-* Student ID: Not-Vietnamese
+* Student Name: Ngo Quang Truong
+* Student ID: BA12-180
 
