@@ -99,7 +99,6 @@ def main():
                 courseDict = courseInfo(numOfCourses, courseDict)
             case 5:   #Input mark
                 markDict = studentMark(studentDict, courseDict, markDict)
-                print(f"marlist {markDict}")
             case 6:   #Show student information
                 showStudentInfo(studentDict)
             case 7:   #Show student course
