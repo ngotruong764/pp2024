@@ -26,17 +26,18 @@ def courseInfo(num_of_courses, course_list):
     return course_list
 
 #Input mark for student in the course
-def studentMark(course_list, student_list, mark_list):
+def studentMark(course_list, student_list, mark_dict):
     course_id = str(input("Enter Course ID: "))    
-    if course_id == course_list[0].getCourseID(): #fix line 31 32 33
-        mark_list.append(course_id)                            
-        for i in range(len(student_list)):
-            grade = float(input(f"{student_list[i].getStudentID()}Enter the mark: "))
-            input_grade = mark.Mark(grade) # input grade
-            mark_list[student_list[i].getStudentID()] =  input_grade.getMark()
-        return mark_list
-    else:
-        print("The course is not avaiable")
+    for i in range(len(course_list)):
+        if course_id == course_list[i].getCourseID():
+            mark_dict[course_id] = dict()                        
+            for j in range(len(student_list)):
+                grade = float(input(f"Name:{student_list[j].getStudentID()} - Enter the mark: "))
+                input_grade = mark.Mark(grade) # input grade
+                mark_dict[course_id][student_list[j].getStudentID()] = input_grade.getMark()
+            return mark_dict
+        elif course_id != course_list[i].getCourseID() and i == len(course_list) -1:
+            print("The course is not avaiable")
     
     
 
@@ -47,7 +48,7 @@ def showStudentInfo(num_of_students, student_list):
         student_id = student_list[i].getStudentID() # Get student ID
         student_name = student_list[i].getStudentName() # Get student Name
         student_dob = student_list[i].getStudentDOB()
-        print(f"{i+1} {student_id} {student_name} {student_dob}")
+        print(f"{i+1}. {student_id} {student_name} {student_dob}")
 
 # Showing course information
 def showCourseInfo(num_of_courses, course_list):
@@ -55,6 +56,16 @@ def showCourseInfo(num_of_courses, course_list):
         course_id = course_list[i].getCourseID()
         course_name = course_list[i].getCourseName()
         print(f"{i+1}. Course ID: {course_id} - Course Name: {course_name}")
+        
+# Showing student marks
+def showStudentMark(mark_dict):
+    course_id = str(input("Select the course ID: "))
+    if course_id in mark_dict:
+        for student_id, mark in mark_dict[course_id].items():
+            print(f"ID:{student_id} - Mark:{mark}" )
+    elif course_id not in mark_dict :
+        print("The course is not avaiable")
+    
 
 # Main function       
 def main():
@@ -64,7 +75,7 @@ def main():
     num_of_courses = 0
     course_list = list()
     
-    mark_list = list()
+    mark_dict = dict()
     
     while(True):
         print("""
@@ -92,13 +103,18 @@ def main():
                 num_of_courses = int(input("Enter the number of courses: "))
             case 4:
                 course_list = courseInfo(num_of_courses, course_list)
+                print(course_list)
             case 5:
-                mark_list = studentMark(course_list, student_list, mark_list)
+                mark_dict = studentMark(course_list, student_list, mark_dict)
             case 6:
                 showStudentInfo(num_of_students, student_list)
             case 7:
                 showCourseInfo(num_of_courses, course_list)
-                
+            case 8:
+                showStudentMark(mark_dict)
+            case _ :
+                print("No Action!")
+            
 
 #MAIN      
 if __name__ == "__main__":
