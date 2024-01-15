@@ -29,12 +29,11 @@ def courseInfo(num_of_courses, course_list):
 def studentMark(course_list, student_list, mark_dict):
     course_id = str(input("Enter Course ID: "))    
     for i in range(len(course_list)):
-        if course_id == course_list[i].getCourseID():
-            mark_dict[course_id] = dict()                        
+        if course_id == course_list[i].getCourseID(): # check that the course_id in the course_list or not
+            mark_dict[course_id] = list()                     
             for j in range(len(student_list)):
                 grade = float(input(f"Name:{student_list[j].getStudentID()} - Enter the mark: "))
-                input_grade = mark.Mark(grade) # input grade
-                mark_dict[course_id][student_list[j].getStudentID()] = input_grade.getMark()
+                mark_dict[course_id].append(mark.Mark(grade, student_list[j].getStudentID(), student_list[j].getStudentName(), student_list[j].getStudentDOB()))
             return mark_dict
         elif course_id != course_list[i].getCourseID() and i == len(course_list) -1:
             print("The course is not avaiable")
@@ -61,8 +60,8 @@ def showCourseInfo(num_of_courses, course_list):
 def showStudentMark(mark_dict):
     course_id = str(input("Select the course ID: "))
     if course_id in mark_dict:
-        for student_id, mark in mark_dict[course_id].items():
-            print(f"ID:{student_id} - Mark:{mark}" )
+        for i in range(len(mark_dict[course_id])):
+            print(f"ID:{mark_dict[course_id][i].getStudentID()} - Mark:{mark_dict[course_id][i].getMark()}" )
     elif course_id not in mark_dict :
         print("The course is not avaiable")
     
@@ -103,7 +102,6 @@ def main():
                 num_of_courses = int(input("Enter the number of courses: "))
             case 4:
                 course_list = courseInfo(num_of_courses, course_list)
-                print(course_list)
             case 5:
                 mark_dict = studentMark(course_list, student_list, mark_dict)
             case 6:
