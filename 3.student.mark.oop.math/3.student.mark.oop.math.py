@@ -1,6 +1,7 @@
 import student
 import course
 import mark
+import math
 
 
 # Checking valid type
@@ -8,18 +9,18 @@ def validTypeChecking(value, type_name):
     while True:
         try:
             value = int(value)
-            if value <= 0 and type_name == "positive_number":   # raise exception for students
-                raise ValueError                # Don't need to raise exception <= 0 for course because of DEFAULT
-            elif value < 0 or value > 20 and type_name == "mark":   # raise exception for marks
+            if value <= 0 and type_name == "positive_number":  # raise exception for students
+                raise ValueError  # Don't need to raise exception <= 0 for course because of DEFAULT
+            elif value < 0 or value > 20 and type_name == "mark":  # raise exception for marks
                 raise ValueError
             if value is not ValueError:
-                return value       # Return value while we don't have exception
+                return value  # Return value while we don't have exception
         except ValueError:
-            if type_name == "positive_number":      # Exception for students
+            if type_name == "positive_number":  # Exception for students
                 value = input("Accept only positive integers. Please enter again: ")
-            elif type_name == "option":     # Exception for courses
+            elif type_name == "option":  # Exception for courses
                 value = input("No Action! Accept only number 0-8. Please enter again: ")
-            elif type_name == "mark":       # Exception for marks
+            elif type_name == "mark":  # Exception for marks
                 value = input("Accept only number 0-20. Please enter again: ")
 
 
@@ -36,7 +37,7 @@ def studentChecking(student_list, student_id):
 def courseChecking(course_list, course_id):
     for i in range(len(course_list)):
         if course_id in course_list[i].getCourseID():
-            print(f"Course ID: \"{course_id}\" already exist!")
+            # print(f"Course ID: \"{course_id}\" already exist!")
             return True
     return False
 
@@ -65,6 +66,7 @@ def courseInfo(num_of_courses, course_list):
         course_id = str(input("\nCourse ID: "))
         while courseChecking(course_list, course_id):  # While True -> course_ID already exist
             course_id = str(input("\nCourse ID: "))
+            print(f"Course ID: \"{course_id}\" already exist!")
         if not courseChecking(course_list, course_id):
             course_name = str(input("Course Name: "))
             course_info = course.Course(course_id, course_name)
@@ -95,7 +97,7 @@ def studentMark(course_list, student_list, mark_dict):
         mark_dict[course_id] = list()
         for j in range(len(student_list)):
             grade = float(input(f"Name:{student_list[j].getStudentID()} - Enter the mark: "))
-            grade = validTypeChecking(grade, "mark")
+            grade = round(validTypeChecking(grade, "mark"), 2)  # Use round function to floor the
             mark_dict[course_id].append(
                 mark.Mark(grade, student_list[j].getStudentID(), student_list[j].getStudentName(),
                           student_list[j].getStudentDOB()))
