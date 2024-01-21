@@ -15,7 +15,6 @@ class Mark(student.Student, course.Course):
     def setMark(self, course_id, mark):
         new_mark = np.array([(course_id, mark)], dtype=self.mark_arr.dtype)
         self.mark_arr = np.append(self.mark_arr, new_mark)
-        print(self.mark_arr)
 
     def getMark(self, course_id):
         boolean_mask = self.mark_arr['course_id'] == course_id  # boolean indexing array

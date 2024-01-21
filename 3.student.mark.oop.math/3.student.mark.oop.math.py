@@ -105,6 +105,19 @@ def studentMark(course_list, student_list):
     return student_list
 
 
+def sortMarks(student_list, sort_option):
+    temp_mark_list = np.array([], dtype=[('Student ID', 'U100'), ('Mark', 'U100')])
+    for i in range(len(student_list)):
+        if student_list[i].getMark("GPA") is not None:  # Retrieve student mark into list
+            student_temp_mark = np.array([(student_list[i].getStudentID(), student_list[i].getMark("GPA"))],
+                                         dtype=temp_mark_list.dtype)
+            temp_mark_list = np.append(temp_mark_list, student_temp_mark)
+    temp_mark_list = np.sort(temp_mark_list)  # Sorting ascending
+    if sort_option == "2":  # 0 sort for descending
+        temp_mark_list = temp_mark_list[-1::-1]  # slicing array
+    showAverageGPA(temp_mark_list)
+
+
 # Calculate average GPA
 def calAverageGPA(course_list, student_list):
     # Option
@@ -122,8 +135,15 @@ def calAverageGPA(course_list, student_list):
                 if grade is not None:
                     total_grade += grade * course_list[j].getCourseCredit()
                     total_credit += course_list[j].getCourseCredit()
-            average_gpq = math.floor(((total_grade / total_credit) * 10) / 10)
-            print(f"{student_list[i].getStudentID()}: {average_gpq}")  # Calculate average GPA
+            average_gpq = round(total_grade / total_credit, 2)  # Calculate average GPA
+            student_list[i].setMark("GPA", average_gpq)
+            print(f"{student_list[i].getStudentID()}: {average_gpq}")
+
+        sort_decision = input("Do you want to sort GPA? (y/n): ")
+        if sort_decision.lower() == "y":
+            print("1: Ascending GPA\n2: Descending")
+            sort_option = input("Sort option: ")
+            sortMarks(student_list, sort_option)
 
 
 # Showing students information
@@ -159,7 +179,12 @@ def showStudentMark(student_list):
             break
 
 
-# Main function       
+def showAverageGPA(mark_list):
+    for i in range(len(mark_list)):
+        print(f"Student ID: {mark_list[i]['Student ID']} - GPA:{mark_list[i]['Mark']}")
+
+
+# Main function
 def main():
     num_of_students = 0
     student_list = list()
