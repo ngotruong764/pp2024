@@ -2,13 +2,17 @@ import student
 import course
 import mark
 import math
+import numpy as np
 
 
 # Checking valid type
 def validTypeChecking(value, type_name):
     while True:
         try:
-            value = int(value)
+            if type_name != "mark":  # Assign type
+                value = int(value)
+            else:
+                value = float(value)
             if value <= 0 and type_name == "positive_number":  # raise exception for students
                 raise ValueError  # Don't need to raise exception <= 0 for course because of DEFAULT
             elif value < 0 or value > 20 and type_name == "mark":  # raise exception for marks
@@ -55,7 +59,7 @@ def studentInfo(num_of_students, student_list):
             if not studentChecking(student_list, student_id):
                 student_name = str(input("Student Name: "))
                 student_dob = str(input("Student DOB:"))
-                stu_info = student.Student(student_id, student_name, student_dob)
+                stu_info = mark.Mark(student_id, student_name, student_dob)
                 student_list.append(stu_info)
         return student_list
 
@@ -65,43 +69,61 @@ def courseInfo(num_of_courses, course_list):
     for i in range(num_of_courses):
         course_id = str(input("\nCourse ID: "))
         while courseChecking(course_list, course_id):  # While True -> course_ID already exist
-            course_id = str(input("\nCourse ID: "))
+            course_id = str(input("\nCourse ID: "))  # -> Enter new course_ID
             print(f"Course ID: \"{course_id}\" already exist!")
         if not courseChecking(course_list, course_id):
             course_name = str(input("Course Name: "))
-            course_info = course.Course(course_id, course_name)
+            course_credit = input("Course Credit:")
+            course_credit = validTypeChecking(course_credit, "positive_number")  # Check the validity of credit
+            course_info = course.Course(course_id, course_name, course_credit)
             course_list.append(course_info)
     return course_list
 
 
 # Input mark for student in the course
-def studentMark(course_list, student_list, mark_dict):
+def studentMark(course_list, student_list):
     course_id = str(input("Select Course ID: "))
-    while not courseChecking(course_list, course_id):
-        if not courseChecking(course_list, course_id):  # if false -> the course does not exist -> create course
-            print(f"\nThe course ID \"{course_id}\" is not exist!")
-            print("The existed courses:")
-            showCourseInfo(course_list)
-            create_course = str(input("Do you want to create new course? (Y/N): "))
-            if create_course.lower() == "y":
-                print("Creating new course...")
-                course_list.append(courseInfo(1, course_list))  # create course
-            elif create_course.lower() == "n":
-                course_id = str(input("\nSelect Course ID: "))
-            else:
-                print("Invalid choice. Please try again!")
+    while not courseChecking(course_list, course_id):  # if false -> the course does not exist -> create course
+        print(f"\nThe course ID \"{course_id}\" is not exist!")
+        print("The existed courses:")
+        showCourseInfo(course_list)
+        create_course = str(input("Do you want to create new course? (Y/N): "))
+        if create_course.lower() == "y":
+            print("Creating new course...")
+            course_list.append(courseInfo(1, course_list))  # create course
+        elif create_course.lower() == "n":
+            course_id = str(input("\nSelect Course ID: "))
+        else:
+            print("Invalid choice. Please try again!")
     if len(student_list) == 0:
         print("--THERE ARE NO STUDENTS INFORMATION--")
-
     else:  # if true -> the course already exist -> can input mark
-        mark_dict[course_id] = list()
-        for j in range(len(student_list)):
-            grade = float(input(f"Name:{student_list[j].getStudentID()} - Enter the mark: "))
-            grade = round(validTypeChecking(grade, "mark"), 2)  # Use round function to floor the
-            mark_dict[course_id].append(
-                mark.Mark(grade, student_list[j].getStudentID(), student_list[j].getStudentName(),
-                          student_list[j].getStudentDOB()))
-    return mark_dict
+        for i in range(len(student_list)):
+            grade = float(input(f"Name:{student_list[i].getStudentID()} - Enter the mark: "))
+            grade = round(validTypeChecking(math.floor(grade * 10) / 10, "mark"), 1)  # Use floor method to floor the
+            student_list[i].setMark(str(course_id), grade)
+    return student_list
+
+
+# Calculate average GPA
+def calAverageGPA(course_list, student_list):
+    # Option
+    print("""ALL: calculate average GPA of all courses
+    Single course: calculate average GPA of course
+    0: Terminate and Calculate""")
+
+    course_id = str(input("Select Course ID: "))
+    if course_id.lower() == "all":  # Calculate average mark for all course
+        for i in range(len(student_list)):
+            total_grade = 0
+            total_credit = 0
+            for j in range(len(course_list)):
+                grade = student_list[i].getMark(course_list[j].getCourseID())
+                if grade is not None:
+                    total_grade += grade * course_list[j].getCourseCredit()
+                    total_credit += course_list[j].getCourseCredit()
+            average_gpq = math.floor(((total_grade / total_credit) * 10) / 10)
+            print(f"{student_list[i].getStudentID()}: {average_gpq}")  # Calculate average GPA
 
 
 # Showing students information
@@ -122,17 +144,19 @@ def showCourseInfo(course_list):
         for i in range(len(course_list)):
             course_id = course_list[i].getCourseID()
             course_name = course_list[i].getCourseName()
-            print(f"{i + 1}. Course ID: {course_id} - Course Name: {course_name}")
+            course_credit = course_list[i].getCourseCredit()
+            print(f"{i + 1}. Course ID: {course_id} - Course Name: {course_name} - Course Credit: {course_credit}")
 
 
 # Showing student marks
-def showStudentMark(mark_dict):
+def showStudentMark(student_list):
     course_id = str(input("Select the course ID: "))
-    if course_id in mark_dict:
-        for i in range(len(mark_dict[course_id])):
-            print(f"ID:{mark_dict[course_id][i].getStudentID()} - Mark:{mark_dict[course_id][i].getMark()}")
-    elif course_id not in mark_dict:
-        print("The course is not available")
+    for i in range(len(student_list)):
+        if student_list[i].getMark(course_id) is not None:
+            print(f"Student ID:{student_list[i].getStudentID()} - Mark:{student_list[i].getMark(course_id)}")
+        else:
+            print("The course is not available")
+            break
 
 
 # Main function       
@@ -143,7 +167,7 @@ def main():
     num_of_courses = 0
     course_list = list()
 
-    mark_dict = dict()
+    mark_dict = list()
 
     while True:
         print("""
@@ -175,13 +199,15 @@ def main():
             case 4:
                 course_list = courseInfo(num_of_courses, course_list)
             case 5:
-                mark_dict = studentMark(course_list, student_list, mark_dict)
+                student_list = studentMark(course_list, student_list)
             case 6:
-                showStudentInfo(student_list)
+                calAverageGPA(course_list, student_list)
             case 7:
-                showCourseInfo(course_list)
+                showStudentInfo(student_list)
             case 8:
-                showStudentMark(mark_dict)
+                showCourseInfo(course_list)
+            case 9:
+                showStudentMark(student_list)
             case _:
                 print("No Action! Please enter an valid option...")
 
