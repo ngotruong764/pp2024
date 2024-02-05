@@ -28,6 +28,7 @@ def main():
         option = ip.validTypeChecking(option, "option")
         match option:
             case 0:
+                ip.compress_to_dat(["students.txt", "courses.txt", "marks.txt"], "student.dat") # Compress to .dat file
                 ip.deleteFile("students.txt")
                 ip.deleteFile("courses.txt")
                 ip.deleteFile("marks.txt")

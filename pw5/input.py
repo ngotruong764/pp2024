@@ -3,7 +3,7 @@ from domains import course
 import output as op
 import math
 import os
-
+import zipfile
 
 # Checking valid type
 def validTypeChecking(value, type_name):
@@ -131,6 +131,13 @@ def writeToFile(file_name, obj, course_id="null"):
 
 # Delete file
 def deleteFile(file_name):
-    option = input("0: Delete file\n1: Save file")
-    if option == "0":
-        os.remove(file_name)
+    os.remove(file_name)
+
+
+# Compress file
+def compress_to_dat(files, output_file):
+    with zipfile.ZipFile(output_file, 'w') as zf:
+        for file in files:
+            zf.write(file)
+
+
