@@ -10,6 +10,10 @@ def main():
     num_of_courses = 0
     course_list = list()
 
+    decompress = ip.decompressFile("student.dat")   # True: decompress - False: no action
+    if decompress:
+        course_list = ip.readFile("courses.txt")
+        student_list = ip.readFile("marks.txt")
     while True:
         print("""
             OPTION
@@ -28,7 +32,10 @@ def main():
         option = ip.validTypeChecking(option, "option")
         match option:
             case 0:
-                ip.compress_to_dat(["students.txt", "courses.txt", "marks.txt"], "student.dat") # Compress to .dat file
+                ip.writeToFile("students.txt", student_list)
+                ip.writeToFile("courses.txt", course_list)
+                ip.writeToFile("marks.txt", student_list)
+                ip.compress_to_dat(["students.txt", "courses.txt", "marks.txt"], "student.dat")  # Compress to .dat file
                 ip.deleteFile("students.txt")
                 ip.deleteFile("courses.txt")
                 ip.deleteFile("marks.txt")

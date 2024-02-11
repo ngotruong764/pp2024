@@ -4,6 +4,8 @@ import output as op
 import math
 import os
 import zipfile
+import pickle
+
 
 # Checking valid type
 def validTypeChecking(value, type_name):
@@ -37,6 +39,7 @@ def studentChecking(student_list, student_id):
     return False
 
 
+# Checking course
 def courseChecking(course_list, course_id, option='b'):  # option == r: retrieve course object
     for i in range(len(course_list)):  # option == n: return boolean
         if course_id in course_list[i].getCourseID():
@@ -62,7 +65,7 @@ def studentInfo(num_of_students, student_list):
                 student_dob = str(input("Student DOB:"))
                 stu_info = mark.Mark(student_id, student_name, student_dob)  # Student infor object
                 student_list.append(stu_info)
-                writeToFile("students.txt", stu_info)
+                # writeToFile("students.txt", stu_info)
         return student_list
 
 
@@ -79,7 +82,7 @@ def courseInfo(num_of_courses, course_list):
             course_credit = validTypeChecking(course_credit, "positive_number")  # Check the validity of credit
             course_info = course.Course(course_id, course_name, course_credit)
             course_list.append(course_info)
-            writeToFile("courses.txt", course_info)
+            # writeToFile("courses.txt", course_info)
     return course_list
 
 
@@ -101,32 +104,32 @@ def studentMark(course_list, student_list):
     if len(student_list) == 0:
         print("--THERE ARE NO STUDENTS INFORMATION--")
     else:  # if true -> the course already exist -> can input mark
-        # Write course to file
-        course_obj = courseChecking(course_list, course_id, 'r')
-        with open("marks.txt", 'a') as file:
-            file.writelines(course_obj.getCourseID() + " - " + course_obj.getCourseName() + "\n")
         # input student
         for i in range(len(student_list)):
             grade = float(input(f"Name:{student_list[i].getStudentID()} - Enter the mark: "))
             grade = round(validTypeChecking(math.floor(grade * 10) / 10, "mark"), 1)  # Use floor method to floor the
             student_list[i].setMark(str(course_id), grade)
-            writeToFile("marks.txt", student_list[i], course_id)
+            # writeToFile("marks.txt", student_list[i])
     return student_list
 
 
-# Write to file
-def writeToFile(file_name, obj, course_id="null"):
-    with open(file_name, 'a') as file:
-        if file_name == "students.txt":
-            file.writelines(
-                "ID: " + obj.getStudentID() + " Name: " + obj.getStudentName() + " DOB: " + obj.getStudentDOB() + "\n")
-        elif file_name == "courses.txt":
-            file.writelines("ID: " + obj.getCourseID() + " Name: " + obj.getCourseName() + "\n")
-        elif file_name == "marks.txt":
-            file.writelines(
-                "ID: " + obj.getStudentID() + " Name: " + obj.getStudentName() + " Mark: " + str(
-                    obj.getMark(course_id)))
-            file.writelines("\n")
+# Write object to file
+def writeToFile(file_name, lst):
+    with open(file_name, 'ab') as file:
+        for i in range(len(lst)):
+            pickle.dump(lst[i], file)
+
+
+# Read object from file
+def readFile(file_name):
+    lst = []
+    try:
+        with open(file_name, 'rb') as file:
+            while True:
+                value = pickle.load(file)
+                lst.append(value)
+    except EOFError:
+        return lst
 
 
 # Delete file
@@ -141,3 +144,16 @@ def compress_to_dat(files, output_file):
             zf.write(file)
 
 
+# Decompress file
+def decompressFile(decompressed_file):
+    if os.path.isfile(decompressed_file):
+        option = str(input(f"Do you want to decompress the {decompressed_file} (Y/N):"))
+        if option.lower() == "y":
+            with zipfile.ZipFile(decompressed_file, 'r') as unzip:
+                unzip.extractall(".")  # . is current directory
+            print(f"Decompressed file {decompressed_file} has been successfully.")
+            return True  # True = decompress
+        return False
+    else:
+        print(f"The file {decompressed_file} does not exist.")
+        return False    # False = no action
